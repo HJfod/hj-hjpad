@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>HJpad</title>
+<style>
+body {
+	background: #131325;
+	font-family: Roboto Light;
+	color: #ffffff;
+	overflow: hidden;
+}
+
+text {
+	font-family: Roboto Light;
+	font-size: 16px;
+	color: #ffffff;
+	overflow: hidden;
+}
+
+.menu {
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 10%;
+	background-color: #232343;
+}
+
+.menuIcon {
+	background-color: none;
+	
+	-webkit-transition-duration: 0.2s;
+	transition-duration: 0.2s;
+}
+
+.menuIcon:hover {
+	background-color: #4f4f4f;
+	cursor: pointer;
+}
+
+.area {
+	top: calc(0% + 55px);
+	left: calc(0% + 10px);
+	width: calc(100% - 20px);
+	height: calc(100% - 60px);
+	position: absolute;
+	background-color: none;
+}
+</style>
+</head>
+<body>
+<div class="menu">
+<text style="position: absolute; top: 15px; left: 15px; font-size: 20px;">HJpad v1.0 Info</text>
+<span title="Close Window">
+<image class='menuIcon' src="icons/window-close-line.png" align="right" onclick="window.close()">
+</span>
+</div>
+
+<div class="area">
+<text style="color:#5f5fff; font-size: 18px;">Created by HJfod</text><br><br>
+<text>Hotkeys:</text><br>
+<text style="color:#afafaf;">Ctrl + Q: Close Program</text><br>
+<text style="color:#afafaf;">Ctrl + F: Toggle Fullscreen</text><br>
+<text style="color:#afafaf;">Ctrl + S: Save file</text><br>
+<text style="color:#afafaf;">Ctrl + O: Open file</text><br>
+<text style="color:#afafaf;">Ctrl + N: New file</text><br>
+<text style="color:#afafaf;">Ctrl + T: Change font</text><br>
+<text style="color:#afafaf;">Ctrl + M: Change font size</text><br>
+<text style="color:#afafaf;">Ctrl + B: Change colour</text><br>
+<text style="color:#5f5fff; font-size: 18px;">For support, contact HJfod on 
+<a href="https://discord.gg/" target="_blank" style="color:#ff5fff; font-size: 18px;">Discord</a> @ </text><text style="color:#5fff5f; font-size: 18px;">HJfod#1795.
+</text><br><br>
+<text>Icons from <a href="https://clarity.design/icons" target="_blank" style="color:#ff5fff; font-size: 18px;">Clarity</a>. Built with Electron.</text><br>
+</div>
+
+</body>
+</html>

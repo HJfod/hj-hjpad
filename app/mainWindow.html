@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>HJpad</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="filereader.js"></script>
+<script src="hilitor.js"></script>
+<style>
+body {
+	background: #070713;
+	font-family: Roboto Lt;
+	color: #ffffff;
+	overflow: hidden;
+	
+	-webkit-transition-duration: 0.2s;
+	transition-duration: 0.2s;
+}
+
+textarea {
+	border: none;
+	overflow: hidden;
+	padding: 0;
+	outline: none;
+	background: none;
+	font-family: Roboto Light;
+	font-size: 16px;
+	color: #ffffff;
+	resize: none;
+	
+	-webkit-transition-duration: 0.2s;
+	transition-duration: 0.2s;
+}
+
+text {
+	font-family: Roboto Light;
+	font-size: 16px;
+	color: #ffffff;
+}
+
+p {
+	font-family: Roboto Light;
+	font-size: 16px;
+	color: #ffffff;
+}
+
+input {
+	display: none;
+}
+
+.textinput {
+	display: initial;
+	font-family: Roboto Light;
+	font-size: 16px;
+	color: #ffffff;
+	border: none;
+	background-color: #a0a0a0;
+	top: 20px;
+	position: absolute;
+}
+
+.textinput:hover {
+	background-color: #afafaf;
+}
+
+.menu {
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 10%;
+	background-color: #131325;
+}
+
+.area {
+	top: calc(0% + 55px);
+	left: calc(0% + 10px);
+	width: calc(100% - 20px);
+	height: calc(100% - 60px);
+	position: absolute;
+}
+
+.menuText {
+	top: 20px;
+	position: absolute;
+}
+
+.menuIcon {
+	background-color: none;
+	
+	-webkit-transition-duration: 0.2s;
+	transition-duration: 0.2s;
+}
+
+.menuIcon:hover {
+	background-color: #4f4f4f;
+	cursor: pointer;
+}
+
+.notification {
+	top: -75px;
+	position: absolute;
+	background-color: #2e2e4b;
+	width: 50%;
+	left: 25%;
+	height: 50px;
+	text-align: center;
+	box-shadow: 0px 0px 15px 5px #000000;
+	
+	-webkit-transition-duration: 0.4s;
+    transition-duration: 0.4s;
+}
+</style>
+</head>
+<body>
+
+<div class="menu" id="projectControls">
+
+
+<div id="fileSaving">
+
+<span title="New file">
+<image class='menuIcon' src="icons/file-line.png" onclick="newProject();">
+</span>
+
+<span title="Save file">
+<image class='menuIcon' src="icons/floppy-line.png" onclick="saveProject();">
+</span>
+
+<span title="Open file">
+<image class='menuIcon' src="icons/folder-open-line.png" onclick="document.getElementById('projectLoader').click();">
+</span>
+
+</div>
+
+
+
+<div id="settings">
+
+<span title="Switch Font Size">
+<image class='menuIcon' src="icons/font-size-line.png" onclick="switchVisual('size')">
+</span>
+
+<span title="Switch Font">
+<image class='menuIcon' src="icons/text-line.png" onclick="switchVisual('font')">
+</span>
+
+<span title="Switch Text Colour">
+<image class='menuIcon' src="icons/color-picker-line.png" onclick="switchVisual('txcol')">
+</span>
+
+<span title="Switch GUI Colour">
+<image class='menuIcon' src="icons/picture-line.png" onclick="switchVisual('bgcol')">
+</span>
+
+<span title="Switch Text Align">
+<image class='menuIcon' src="icons/center-text-line.png" onclick="switchVisual('txalign')">
+</span>
+
+</div>
+
+
+
+<span title="Quit">
+<image class='menuIcon' src="icons/window-close-line.png" align="right" onclick="window.close()">
+</span>
+
+<span title="Settings">
+<image class='menuIcon' src="icons/cog-line.png" align="right" onclick="if (showSettings == false){ showSettings = true; }else{ showSettings = false; }">
+</span>
+
+<span title="About">
+<image class='menuIcon' src="icons/info-circle-line.png" align="right" onclick="var info = window.open('infoWindow.html','HJpad Info','height=340,width=460');">
+</span>
+
+<image src="icons/minus-line.png" align="right">
+
+<span title="Show word count">
+<image class='menuIcon' src="icons/sort-by-line.png" align="right" onclick="showNotification('wordcount');">
+</span>
+
+<span title="Show file path">
+<image class='menuIcon' src="icons/hard-disk-line.png" align="right" onclick="showNotification('filelocation');">
+</span>
+
+</div>
+
+
+
+<div id="writingArea">
+<textarea id="textarea" class="area"></textarea>
+</div>
+
+
+<div id='notification' class='notification'>
+<p id="confirmText"></p>
+</div>
+
+
+<input type="file" size="40" id="projectLoader">
+
+<script>
+var confirmt = document.getElementById('confirmText');
+var textArea = document.getElementById("textarea");
+
+var notification = document.getElementById('notification');
+var notificationTime = 2000;
+
+var settings = document.getElementById('settings');
+var fileSaving = document.getElementById('fileSaving');
+var showSettings = false;
+
+var menu = document.getElementById('projectControls');
+
+var fontSize = 16;
+var fontCur = 0;
+var backgroundColour = 1;
+var textColour = 1;
+var textAlign = 1;
+
+var clicks = 0;
+var clickTimeout;
+
+var name = '';
+var currentFilePath = '';
+
+var wordCount = 0;
+var wordCountTest = '';
+
+$('#writingArea').on('mousewheel', function(e){
+    d = e.originalEvent.wheelDelta;
+    $('#textarea')[0].scrollTop -= (d/2);
+});
+
+$(document).on('keydown', function(e){
+	if(e.ctrlKey && e.which === 83){
+		saveProject();
+		e.preventDefault();
+		return false;
+	}else if(e.ctrlKey && e.which === 79){
+		document.getElementById('projectLoader').click();
+		e.preventDefault();
+		return false;
+	}else if(e.ctrlKey && e.which === 78){
+		newProject();
+		e.preventDefault();
+		return false;
+	}else if(e.ctrlKey && e.which === 84){
+		switchVisual('font');
+		e.preventDefault();
+		return false;
+	}else if(e.ctrlKey && e.which === 66){
+		switchVisual('bgcol');
+		e.preventDefault();
+		return false;
+	}else if(e.ctrlKey && e.which === 77){
+		switchVisual('size');
+		e.preventDefault();
+		return false;
+	}
+});
+
+function download(filename, text) {
+	var element = document.createElement('a');
+	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+	element.setAttribute('download', filename);
+	
+	element.style.display = 'none';
+	document.body.appendChild(element);
+	
+	element.click();
+	
+	document.body.removeChild(element);
+}
+
+function newProject() {
+	clearTimeout(clickTimeout);
+	clicks += 1;
+	if (clicks == 1){
+		confirmt.innerHTML = 'Click again to create a new project.';
+		notification.style.top = '50px';
+		clickTimeout = setTimeout(function(){ if (clicks == 1){ notification.style.top = '-75px'; clicks = 0; } }, notificationTime);
+	}else{
+		textArea.value = '';
+		clicks = 0;
+		notification.style.top = '-75px';
+		currentFilePath = '';
+	}
+}
+
+function saveProject() {
+	if (name == ''){
+		name = 'unnamed';
+	}
+	
+	showNotification('default','Make sure to enable viewing file extensions!');
+	
+	download(name, document.getElementById("textarea").value);
+}
+
+function loadProject() {
+	if (document.getElementById("projectLoader").value === ""){
+		return;
+	}
+	
+	var reader = new FileReader();
+	var fileInput = document.getElementById("projectLoader");
+	
+	var fileTypes = ["txt"];
+	
+	var file = fileInput.files[0];
+	var textType = /text.*/;
+	
+	var extension = file.name.split('.').pop().toLowerCase(),  //file extension from input file
+		isSuccess = fileTypes.indexOf(extension) > -1;  //is extension in acceptable types
+	
+	if (isSuccess) { //yes
+		var reader = new FileReader();
+		reader.readAsText(file);
+		reader.onload = function(e) {
+			textArea.value = reader.result;
+			currentFilePath = file.path;
+			name = file.name;
+		}
+	}else{
+		alert("File type invalid.");
+	}
+	
+	fileInput.value = null;
+	return;
+}
+
+function countWords() {
+	wordCountTest = textArea.value.replace(/\s+/g,' ').trim();
+	
+	wordCount = wordCountTest.split(' ').length;
+	
+	if (textArea.value == ''){
+		wordCount = 0;
+	}
+}
+
+function showNotification(type, text = '') {
+	clearTimeout(clickTimeout);
+	if (type == 'wordcount'){
+		confirmt.innerHTML = 'Word count: ' + wordCount;
+		notification.style.top = '50px';
+		clickTimeout = setTimeout(function(){ notification.style.top = '-75px'; }, notificationTime);
+	}else if (type == 'filelocation'){
+		if (currentFilePath == ''){
+			currentFilePath = 'No file opened.';
+		}
+		confirmt.innerHTML = currentFilePath;
+		notification.style.top = '50px';
+		clickTimeout = setTimeout(function(){ notification.style.top = '-75px'; }, notificationTime);
+	}else if (type == 'default'){
+		confirmt.innerHTML = text;
+		notification.style.top = '50px';
+		clickTimeout = setTimeout(function(){ notification.style.top = '-75px'; }, notificationTime);
+	}
+	clicks = 0;
+}
+
+function switchVisual(doWhat){
+	if (doWhat == 'font'){
+		if (fontCur == 0){
+			textArea.style.fontFamily = 'Arial';
+			fontCur = 1;
+		}else if (fontCur == 1){
+			textArea.style.fontFamily = 'Times New Roman';
+			fontCur = 2;
+		}else if (fontCur == 2){
+			textArea.style.fontFamily = 'Roboto Light';
+			fontCur = 0;
+		}
+	}else if (doWhat == 'size'){
+		if (fontSize == 14){
+			fontSize = 16;
+		}else if (fontSize == 16){
+			fontSize = 20;
+		}else if (fontSize == 20){
+			fontSize = 25;
+		}else if (fontSize == 25){
+			fontSize = 30;
+		}else if (fontSize == 30){
+			fontSize = 14;
+		}
+		textArea.style.fontSize = fontSize + 'px';
+	}else if (doWhat == 'bgcol'){
+		if (backgroundColour == 0){
+			
+			document.body.style.background = "#070713";
+			notification.style.backgroundColor = "#2e2e4b";
+			menu.style.backgroundColor = "#131325";
+			backgroundColour = 1;
+			
+		}else if (backgroundColour == 1){
+			
+			document.body.style.background = "#13060e";
+			notification.style.backgroundColor = "#4b2e3f";
+			menu.style.backgroundColor = "#24131f";
+			backgroundColour = 2;
+			
+		}else if (backgroundColour == 2){
+			
+			document.body.style.background = "#061309";
+			notification.style.backgroundColor = "#2f4a31";
+			menu.style.backgroundColor = "#142413";
+			backgroundColour = 0;
+			
+		}
+	}else if (doWhat == 'txcol'){
+		if (textColour == 0){
+			
+			textArea.style.color = "#ffffff";
+			textColour = 1;
+			
+		}else if (textColour == 1){
+			
+			textArea.style.color = "#a0ffa0";
+			textColour = 2;
+			
+		}else if (textColour == 2){
+			
+			textArea.style.color = "#ffff00";
+			textColour = 0;
+			
+		}
+	}else if (doWhat == 'txalign'){
+		if (textAlign == 0){
+			
+			textArea.style.textAlign = "left";
+			textAlign = 1;
+			
+		}else if (textAlign == 1){
+			
+			textArea.style.textAlign = "center";
+			textAlign = 2;
+			
+		}else if (textAlign == 2){
+			
+			textArea.style.textAlign = "right";
+			textAlign = 0;
+			
+		}
+	}
+}
+
+function loop() {
+	loadProject();
+	
+	countWords();
+	
+	if (showSettings == true){
+		settings.style.display = 'initial';
+		fileSaving.style.display = 'none';
+	}else{
+		settings.style.display = 'none';
+		fileSaving.style.display = 'initial';
+	}
+	
+	requestAnimationFrame(loop);
+}
+
+loop();
+
+</script>
+</body>
+</html>
